@@ -186,10 +186,9 @@ do
 			for file in $OUTDIR/$SAMPLE/intronerated_contigs/*_supercontig.fasta
 			do
 				GENE=${file/_supercontig.fasta/}
-				sed -i "s/ .*//" $file
-				sed -i "s/\(>.*\)/\1-$GENE/" $file
-				awk '{if(NR==1) {print $0} else {if($0 ~ /^>/) {print "\n"$0} else {printf $0}}}' "$file" > "${file/_supercontig/_intronerated}"
-				rm "$file" -f
+				sed "s/ .*//" $file | sed -E "s/(>.*)/\1-$GENE/" > temp.fasta
+				awk '{if(NR==1) {print $0} else {if($0 ~ /^>/) {print "\n"$0} else {printf $0}}}' temp.fasta > "${file/_supercontig/_intronerated}"
+				rm "$file" temp.fasta
 				echo "" >> "${file/_supercontig/_intronerated}"
 			done
 			CONTIGPATH="$OUTDIR/$SAMPLE/intronerated_contigs"
