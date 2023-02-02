@@ -175,11 +175,13 @@ do
 		cp $PIPERDIR/$SAMPLE/*/*/sequences/intron/*_supercontig.fasta $OUTDIR/$SAMPLE/intronerated_contigs/ 2> /dev/null
 		for file in $OUTDIR/$SAMPLE/intronerated_contigs/*_supercontig.fasta
 		do 
-			GENE=${file/_supercontig.fasta/}
-			sed "s/ .*//" $file | sed -E "s/(>.*)/\1-$GENE/" > temp.fasta
-			awk '{if(NR==1) {print $0} else {if($0 ~ /^>/) {print "\n"$0} else {printf $0}}}' temp.fasta > "${file/_supercontig/_intronerated}"
-			rm "$file" temp.fasta
-			echo "" >> "${f/_supercontig/_intronerated}"
+			filename="$(basename $file)"
+			GENE=${filename/_supercontig.fasta/}
+			sed -i "s/ .*//" $file
+			sed -E -i "s/(>.*)/\1-$GENE/" $file
+			awk '{if(NR==1) {print $0} else {if($0 ~ /^>/) {print "\n"$0} else {printf $0}}}' "$file" > "${file/_supercontig/_intronerated}"
+			rm "$file"
+			echo "" >> "${file/_supercontig/_intronerated}"
 		done
 		CONTIGPATH="$OUTDIR/$SAMPLE/intronerated_contigs"
 		mkdir -p "$OUTDIR/$SAMPLE/intronerated_consensus"
